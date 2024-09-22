@@ -15,7 +15,7 @@ def image_to_base64(img):
 
 # Define the path to the model weights
 model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
-
+# model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
 # Load the pre-trained ResNet50 model
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = resnet50(pretrained=True)
@@ -52,7 +52,7 @@ transform = transforms.Compose([
 # """)
 
 logo_image = Image.open("/mount/src/visage-app/visageLogo.jpg")
-
+# logo_image = Image.open("visageLogo.jpg")
 # Combined markdown for HTML and CSS
 st.markdown(
     f"""
@@ -66,11 +66,15 @@ st.markdown(
     .centered img {{
         margin-bottom: 20px;
     }}
+    .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
+    .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
+    .viewerBadge_text__1JaDK {{
+        display: none;
+    }}
     </style>
     <div class="centered">
         <img src="data:image/png;base64,{image_to_base64(logo_image)}" width="400">
         <h1>VisageMed: Diabetes Detection from Facial Images</h1>
-        <h3>Welcome to VisageMed</h3>
         <p>This app analyzes facial images to detect the likelihood of diabetes using deep learning techniques.</p>
         <p>Upload a facial image or capture one using your camera, and our model will predict the probability of diabetes.</p>
     </div>
@@ -78,18 +82,12 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown(
-    """
-    <style>
-    .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
-    .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
-    .viewerBadge_text__1JaDK {
-        display: none;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# st.markdown(
+#     """
+
+#     """,
+#     unsafe_allow_html=True
+# )
 
 st.sidebar.title("About VisageMed")
 st.sidebar.info("""
