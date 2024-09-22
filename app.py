@@ -4,6 +4,13 @@ import torch
 import torchvision.transforms as transforms
 from torchvision.models import resnet50
 import torch.nn as nn
+from io import BytesIO
+
+# Function to convert the image to base64
+def image_to_base64(img):
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode()
 
 # Define the path to the model weights
 model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
@@ -58,7 +65,7 @@ st.markdown(
         <img src="data:image/png;base64,{img_data}" width="80" style="margin-right: 20px;">
         <h1>VisageMed: Diabetes Detection from Facial Images</h1>
     </div>
-    """.format(img_data=st.image_to_base64(image)),
+    """.format(img_data=image_to_base64(logo_image)),
     unsafe_allow_html=True
 )
 
