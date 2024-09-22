@@ -5,6 +5,7 @@ import torchvision.transforms as transforms
 from torchvision.models import resnet50
 import torch.nn as nn
 from io import BytesIO
+import base64
 
 # Function to convert the image to base64
 def image_to_base64(img):
@@ -13,14 +14,8 @@ def image_to_base64(img):
     return base64.b64encode(buffered.getvalue()).decode()
 
 # Define the path to the model weights
-model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
+model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
 
-hide_github_icon = """
-#GithubIcon {
-  visibility: hidden;
-}
-"""
-st.markdown(hide_github_icon, unsafe_allow_html=True)
 # Load the pre-trained ResNet50 model
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = resnet50(pretrained=True)
@@ -42,42 +37,51 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-# Streamlit app
-st.title("VisageMed: Diabetes Detection from Facial Images")
-st.write("""
-### Welcome to VisageMed
-This app analyzes facial images to detect the likelihood of diabetes using deep learning techniques.
-Upload a facial image or capture one using your camera, and our model will predict the probability of diabetes.
-""")
+# # Streamlit app
+# st.title("VisageMed: Diabetes Detection from Facial Images")
+# st.write("""
+# ### Welcome to VisageMed
+# This app analyzes facial images to detect the likelihood of diabetes using deep learning techniques.
+# Upload a facial image or capture one using your camera, and our model will predict the probability of diabetes.
+# """)
+
+# st.sidebar.title("About VisageMed")
+# st.sidebar.info("""
+# VisageMed leverages state-of-the-art deep learning models to assess health risks from facial images. This tool is designed to provide a probability score for diabetes based on facial image analysis.
+# For more information on diabetes detection, visit [American Diabetes Association](https://www.diabetes.org/).
+# """)
+
+logo_image = Image.open("visageLogo.jpg")
+
+# Combined markdown for HTML and CSS
+st.markdown(
+    f"""
+    <style>
+    .centered {{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }}
+    .centered img {{
+        margin-bottom: 20px;
+    }}
+    </style>
+    <div class="centered">
+        <img src="data:image/png;base64,{image_to_base64(logo_image)}" width="400">
+        <h1>VisageMed: Diabetes Detection from Facial Images</h1>
+        <h3>Welcome to VisageMed</h3>
+        <p>This app analyzes facial images to detect the likelihood of diabetes using deep learning techniques.</p>
+        <p>Upload a facial image or capture one using your camera, and our model will predict the probability of diabetes.</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.sidebar.title("About VisageMed")
 st.sidebar.info("""
 VisageMed leverages state-of-the-art deep learning models to assess health risks from facial images. This tool is designed to provide a probability score for diabetes based on facial image analysis.
-For more information on diabetes detection, visit [American Diabetes Association](https://www.diabetes.org/).
 """)
-
-logo_image = Image.open("/mount/src/visage-app/visageLogo.jpg")
-
-# Display the title and image side by side using markdown
-st.markdown(
-    """
-    <div style="display: flex; align-items: center;">
-        <img src="data:image/png;base64,{img_data}" width="80" style="margin-right: 20px;">
-        <h1>VisageMed: Diabetes Detection from Facial Images</h1>
-    </div>
-    """.format(img_data=image_to_base64(logo_image)),
-    unsafe_allow_html=True
-)
-
-import streamlit as st
-
-# Add custom CSS to hide the GitHub icon
-hide_github_icon = """
-#GithubIcon {
-  visibility: hidden;
-}
-"""
-st.markdown(hide_github_icon, unsafe_allow_html=True)
 
 # Capture image from camera
 img_file_buffer = st.camera_input("Take a picture")
