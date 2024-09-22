@@ -6,7 +6,7 @@ from torchvision.models import resnet50
 import torch.nn as nn
 
 # Define the path to the model weights
-model_path = "/Users/shir.barzel/BSO/visage/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
+model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
 
 # Load the pre-trained ResNet50 model
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
