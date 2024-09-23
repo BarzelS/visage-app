@@ -6,7 +6,7 @@
      - scipy
      - opencv
      - face_recognition
-     - torch
-     - torchvision
-     - Pillow
-     
+     - pip:
+        - streamlit
+        - torch
+        - torchvision
