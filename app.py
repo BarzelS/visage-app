@@ -14,8 +14,8 @@ def image_to_base64(img):
     return base64.b64encode(buffered.getvalue()).decode()
 
 # Define the path to the model weights
-model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
-# model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
+model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
+
 # Load the pre-trained ResNet50 model
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = resnet50(pretrained=True)
@@ -37,22 +37,9 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-# # Streamlit app
-# st.title("VisageMed: Diabetes Detection from Facial Images")
-# st.write("""
-# ### Welcome to VisageMed
-# This app analyzes facial images to detect the likelihood of diabetes using deep learning techniques.
-# Upload a facial image or capture one using your camera, and our model will predict the probability of diabetes.
-# """)
+# Load your logo image
+logo_image = Image.open("visageLogo.jpg")
 
-# st.sidebar.title("About VisageMed")
-# st.sidebar.info("""
-# VisageMed leverages state-of-the-art deep learning models to assess health risks from facial images. This tool is designed to provide a probability score for diabetes based on facial image analysis.
-# For more information on diabetes detection, visit [American Diabetes Association](https://www.diabetes.org/).
-# """)
-
-logo_image = Image.open("/mount/src/visage-app/visageLogo.jpg")
-# logo_image = Image.open("visageLogo.jpg")
 # Combined markdown for HTML and CSS
 st.markdown(
     f"""
@@ -74,20 +61,12 @@ st.markdown(
     </style>
     <div class="centered">
         <img src="data:image/png;base64,{image_to_base64(logo_image)}" width="400">
-        <h1>VisageMed: Diabetes Detection from Facial Images</h1>
         <p>This app analyzes facial images to detect the likelihood of diabetes using deep learning techniques.</p>
         <p>Upload a facial image or capture one using your camera, and our model will predict the probability of diabetes.</p>
     </div>
     """,
     unsafe_allow_html=True
 )
-
-# st.markdown(
-#     """
-
-#     """,
-#     unsafe_allow_html=True
-# )
 
 st.sidebar.title("About VisageMed")
 st.sidebar.info("""
@@ -105,19 +84,20 @@ if img_file_buffer is not None:
     st.image(img, caption='Facial Image for Diabetes Detection', use_column_width=True)
     
     # Transform the image
-    img = transform(img).unsqueeze(0).to(device)
+    img_tensor = transform(img).unsqueeze(0).to(device)
     
     # Run the model on the image
     with torch.no_grad():
-        output = model(img)
+        output = model(img_tensor)
         probability = output[0][0].item()
     
-# Display the output
+    # Display the output
     if probability > 0.99:
         st.write(f"**Diabetes Detected:** High probability")
     else:
         st.write(f"**No Diabetes Detected:** Low probability")
 
-    del img
+    # Clean up
+    del img_tensor, output
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
