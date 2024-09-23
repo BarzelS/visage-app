@@ -14,8 +14,8 @@ def image_to_base64(img):
     return base64.b64encode(buffered.getvalue()).decode()
 
 # Define the path to the model weights
-model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
-# model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
+# model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
+model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
 # Load the pre-trained ResNet50 model
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = resnet50(pretrained=True)
@@ -51,8 +51,8 @@ transform = transforms.Compose([
 # For more information on diabetes detection, visit [American Diabetes Association](https://www.diabetes.org/).
 # """)
 
-logo_image = Image.open("/mount/src/visage-app/visageLogo.jpg")
-# logo_image = Image.open("visageLogo.jpg")
+# logo_image = Image.open("/mount/src/visage-app/visageLogo.jpg")
+logo_image = Image.open("visageLogo.jpg")
 # Combined markdown for HTML and CSS
 st.markdown(
     f"""
@@ -118,6 +118,6 @@ if img_file_buffer is not None:
     else:
         st.write(f"**No Diabetes Detected:** Low probability")
 
-    del face_img
+    del img
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
