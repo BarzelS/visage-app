@@ -6,6 +6,7 @@ from torchvision.models import resnet50
 import torch.nn as nn
 from io import BytesIO
 import base64
+import face_recognition
 
 # Function to convert the image to base64
 def image_to_base64(img):
@@ -16,6 +17,8 @@ def image_to_base64(img):
 # Define the path to the model weights
 model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
 # model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
+
+pad_image = 70
 # Load the pre-trained ResNet50 model
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = resnet50(pretrained=True)
@@ -37,22 +40,10 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-# # Streamlit app
-# st.title("VisageMed: Diabetes Detection from Facial Images")
-# st.write("""
-# ### Welcome to VisageMed
-# This app analyzes facial images to detect the likelihood of diabetes using deep learning techniques.
-# Upload a facial image or capture one using your camera, and our model will predict the probability of diabetes.
-# """)
-
-# st.sidebar.title("About VisageMed")
-# st.sidebar.info("""
-# VisageMed leverages state-of-the-art deep learning models to assess health risks from facial images. This tool is designed to provide a probability score for diabetes based on facial image analysis.
-# For more information on diabetes detection, visit [American Diabetes Association](https://www.diabetes.org/).
-# """)
-
+# Load your logo image
 logo_image = Image.open("/mount/src/visage-app/visageLogo.jpg")
 # logo_image = Image.open("visageLogo.jpg")
+
 # Combined markdown for HTML and CSS
 st.markdown(
     f"""
@@ -74,20 +65,12 @@ st.markdown(
     </style>
     <div class="centered">
         <img src="data:image/png;base64,{image_to_base64(logo_image)}" width="400">
-        <h1>VisageMed: Diabetes Detection from Facial Images</h1>
         <p>This app analyzes facial images to detect the likelihood of diabetes using deep learning techniques.</p>
         <p>Upload a facial image or capture one using your camera, and our model will predict the probability of diabetes.</p>
     </div>
     """,
     unsafe_allow_html=True
 )
-
-# st.markdown(
-#     """
-
-#     """,
-#     unsafe_allow_html=True
-# )
 
 st.sidebar.title("About VisageMed")
 st.sidebar.info("""
@@ -104,16 +87,38 @@ if img_file_buffer is not None:
     # Display the image
     st.image(img, caption='Facial Image for Diabetes Detection', use_column_width=True)
     
-    # Transform the image
-    img = transform(img).unsqueeze(0).to(device)
+    # Detect faces in the image
+    img_array = face_recognition.load_image_file(img_file_buffer)
+    face_locations = face_recognition.face_locations(img_array)
     
-    # Run the model on the image
-    with torch.no_grad():
-        output = model(img)
-        probability = output[0][0].item()
-    
-    # Display the output
-    if probability > 0.99:
-        st.write(f"**Diabetes Detected:** High probability ({probability:.2f})")
+    if len(face_locations) > 0:
+        # Crop the first detected face
+        top, right, bottom, left = face_locations[0]
+        top = max(0, top - pad_image)
+        left = max(0, left - pad_image)
+        bottom = min(img_array.shape[0], bottom + pad_image)
+        right = min(img_array.shape[1], right + pad_image)
+        face_img = img.crop((left, top, right, bottom))
+        
+        # Display the cropped face
+        st.image(face_img, caption='Cropped Face for Diabetes Detection', use_column_width=True)
+        
+        # Transform the cropped face
+        face_img = transform(face_img).unsqueeze(0).to(device)
+        
+        # Run the model on the cropped face
+        with torch.no_grad():
+            output = model(face_img)
+            probability = output[0][0].item()
+        
+        # Display the output
+        if probability > 0.99:
+            st.write(f"**Diabetes Detected:** High probability")
+        else:
+            st.write(f"**No Diabetes Detected:** Low probability")
+        
+        del face_img
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
     else:
-        st.write(f"**No Diabetes Detected:** Low probability ({probability:.2f})")
+        st.write("No face detected in the image.")
