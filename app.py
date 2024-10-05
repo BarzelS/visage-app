@@ -6,6 +6,7 @@ from torchvision.models import resnet50
 import torch.nn as nn
 from io import BytesIO
 import base64
+import os
 
 # Function to convert the image to base64
 def image_to_base64(img):
@@ -16,6 +17,8 @@ def image_to_base64(img):
 # Define the path to the model weights
 model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
 
+port = int(os.environ.get("PORT", 8000))
+st.run(port=port)
 # Load the pre-trained ResNet50 model
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = resnet50(pretrained=True)
@@ -101,3 +104,4 @@ if img_file_buffer is not None:
     del img_tensor, output
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
+
