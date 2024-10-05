@@ -1,4 +1,5 @@
+requests
 streamlit
 torch
 torchvision
-Pillow
+pillow
