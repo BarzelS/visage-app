@@ -1,0 +1,6 @@
+streamlit
+pillow
+torch
+torchvision
+face_recognition
+requests
