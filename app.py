@@ -15,8 +15,8 @@ def image_to_base64(img):
     return base64.b64encode(buffered.getvalue()).decode()
 
 # Define the path to the model weights
-model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
-# model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
+# model_path = "/mount/src/visage-app/2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
+model_path = "2024-09-15_10-39-01_model_epoch_373_interrupted.pth"
 
 pad_image = 70
 # Load the pre-trained ResNet50 model
@@ -41,8 +41,8 @@ transform = transforms.Compose([
 ])
 
 # Load your logo image
-logo_image = Image.open("/mount/src/visage-app/visageLogo.jpg")
-# logo_image = Image.open("visageLogo.jpg")
+# logo_image = Image.open("/mount/src/visage-app/visageLogo.jpg")
+logo_image = Image.open("visageLogo.jpg")
 
 # Combined markdown for HTML and CSS
 st.markdown(
@@ -56,6 +56,9 @@ st.markdown(
     }}
     .centered img {{
         margin-bottom: 20px;
+    }}
+    .centered p {{
+        font-size: 18px;  /* Adjust the font size as needed */
     }}
     .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
     .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
@@ -71,12 +74,12 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
 st.sidebar.title("About VisageMed")
 st.sidebar.info("""
 VisageMed leverages state-of-the-art deep learning models to assess health risks from facial images. This tool is designed to provide a probability score for diabetes based on facial image analysis.
 """)
 
+has_diabetes = st.radio("Do you have diabetes?", ("Yes", "No"))
 # Capture image from camera
 img_file_buffer = st.camera_input("Take a picture")
 
@@ -85,7 +88,7 @@ if img_file_buffer is not None:
     img = Image.open(img_file_buffer).convert('RGB')
     
     # Display the image
-    st.image(img, caption='Facial Image for Diabetes Detection', use_column_width=True)
+    # st.image(img, caption='Facial Image for Diabetes Detection', use_column_width=True)
     
     # Detect faces in the image
     img_array = face_recognition.load_image_file(img_file_buffer)
